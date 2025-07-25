@@ -1,0 +1,26 @@
+# Node.js dependencies
+node_modules/
+
+# Harhat cache and artifacts
+cache/
+artifacts/
+
+# Hardhat deployment data (if using hardhat-deploy
+deployments/
+
+# Coverage output
+coverage/
+coverage.json
+lcov-report/
+
+# Environment variables
+.env
+
+# Optional OS/system files
+.DS_Store
+Thumbs.db
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
