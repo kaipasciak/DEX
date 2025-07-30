@@ -19,14 +19,14 @@ interface IDEXPair {
      * @param to Address for output to be sent
      * @param data May be omitted, this is just for flash swaps
      */
-    function swap(uint amount0out, uint amount1out, address to, bytes calldata data) external;
+    function Swap(uint amount0out, uint amount1out, address to, bytes calldata data) external;
 
     /**
      *  @notice Issues pool tokens to liquidity providers after depositing liquidity
      *  @param to Address for minted tokens to be sent to
      *  @return liquidity The amount of LP tokens minted 
      */ 
-    function mint(address to) external returns (uint liquidity);
+    function Mint(address to) external returns (uint liquidity);
 
     /**
      * @notice Burns tokens in exchange for the underlying assets
@@ -34,6 +34,8 @@ interface IDEXPair {
      * @return amount0 Amounts sent to to of first asset
      * @return amount1 Amounts sent to to of second asset
      */
-    function burn(address to) external returns (uint amount0, uint amount1);
+    function Burn(address to) external returns (uint amount0, uint amount1);
+
+    /// Helper functions below
 
 }
