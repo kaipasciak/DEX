@@ -36,6 +36,17 @@ interface IDEXPair {
      */
     function Burn(address to) external returns (uint amount0, uint amount1);
 
+    /**
+     * @notice Called from factory to initialize pair contract shortly after deployment
+     */
+    function initialize(address, address) external;
+
     /// Helper functions below
+    /**
+     * @notice Retrieves reserve amounts for token pair
+     * @return reserve0 Amount in reserves for first token
+     * @return reserve1 Amount in reserves for second token
+     */
+    function getReserves() external view returns (uint reserve0, uint reserve1);
 
 }
