@@ -28,8 +28,8 @@ contract DEXPair is IDEXPair {
 
     }
 
-    function Mint(address to) external returns (uint liquidity) {
-
+    function mint(address to) external returns (uint liquidity) {
+        
     }
 
     function Burn(address to) external returns (uint amount0, uint amount1) {

@@ -26,7 +26,7 @@ interface IDEXPair {
      *  @param to Address for minted tokens to be sent to
      *  @return liquidity The amount of LP tokens minted 
      */ 
-    function Mint(address to) external returns (uint liquidity);
+    function mint(address to) external returns (uint liquidity);
 
     /**
      * @notice Burns tokens in exchange for the underlying assets

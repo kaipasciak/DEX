@@ -2,6 +2,7 @@
 pragma solidity ^0.8.28;
 
 import "../core/interfaces/IDEXFactory.sol";
+import "../core/interfaces/IDEXPair.sol";
 
 library DEXQuoter {
     /**
@@ -25,7 +26,7 @@ library DEXQuoter {
      * @return reserveA Amount of token A reserves
      * @return reserveB Amount of token B reserves
      */
-    function getReserves(address factory, address token0, address token1) internal pure returns (uint reserveA, uint reserveB) {
+    function getReserves(address factory, address token0, address token1) internal view returns (uint reserveA, uint reserveB) {
         // Sort tokens first
         require(token0 != token1, "Error: Identical addresses");
         (address tokenA, address tokenB) = token0 < token1 ? (token0, token1) : (token1, token0);
@@ -35,13 +36,13 @@ library DEXQuoter {
         address pair = address(uint160(uint256(keccak256(abi.encodePacked(
                 hex'ff',
                 factory,
-                keccak256(abi.encodePacked(token0, token1)),
+                keccak256(abi.encodePacked(tokenA, tokenB)),
                 hex'96e8ac4277198ff8b6f785478aa9a39f403cb768dd02cbee326c3e7da348845f' // TODO: Replace with pair contract init code hash
             )))));
 
         (uint reserve0, uint reserve1) = IDEXPair(pair).getReserves();
+        (reserveA, reserveB) = tokenA == token0 ? (reserve0, reserve1) : (reserve1, reserve0);
         
-
     }
 
     /**
@@ -59,7 +60,20 @@ library DEXQuoter {
         amountB = (reserveB / reserveA) * amountA;
     }
 
-    // Get amounts out
+    // Get amount out
+    /**
+     * @notice Given an input amount, calculate the output
+     * @param amountIn Input amount
+     * @param reserveIn Amount in input token reserves
+     * @param reserveOut Amount in output token reserves
+     * @return amountOut Output amount
+     */
+    function getAmountOut(uint amountIn, uint reserveIn, uint reserveOut) internal pure returns (uint amountOut) {
+        require(reserveIn > 0 && reserveOut > 0, "Error: Insufficient liquidity");
+        require(amountIn > 0, "Error: Invalid input amount");
 
+        uint postFee = amountIn * 997;
+        amountOut = (postFee * reserveOut) / ((reserveOut * 1000) + postFee);
+    }
 
 }
