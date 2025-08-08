@@ -3,9 +3,11 @@ pragma solidity ^0.8.28;
 
 import './interfaces/IDEXRouter.sol';
 import './DEXQuoter.sol';
+import '../token/IWETH.sol';
 
 contract DEXRouter is IDEXRouter {
     address public immutable override factory;
+    address public immutable override WETH;
 
     /**
      * @notice Factory address is set on construction
@@ -88,7 +90,22 @@ contract DEXRouter is IDEXRouter {
         uint amountETHMin,
         address to,
         uint deadline
-    ) external returns (uint amountA, uint amountB) {}
+    ) external payable ensure(deadline) returns (uint amountToken, uint amountETH, uint liquidity) {
+        (amountToken, amountETH) = _addLiquidity(
+            token,
+            WETH,
+            amountTokenDesired,
+            msg.value,
+            amountTokenMin,
+            amountETHMin
+        );
+        address pair = DEXQuoter.pairFor(factory, token, WETH);
+        safeTransferFrom(token, msg.sender, pair, amountToken);
+        IWETH(WETH).deposit{value: amountETH}();
+        assert(IWETH(WETH).transfer(pair, amountETH));
+        liquidity = IDEXPair(pair).mint(to);
+        if (msg.value > amountETH) safeTransferETH(msg.sender, msg.value - amountETH);
+    }
 
     function removeLiquidity(
         address tokenA,
@@ -124,6 +141,8 @@ contract DEXRouter is IDEXRouter {
     function swapExactTokensForETH(uint amountIn, uint amountOutMin, address[] calldata path, address to, uint deadline)
     external payable returns (uint[] memory amounts) {}
 
+    // Helper functions
+
     function safeTransferFrom(address token,
         address from,
         address to,
@@ -133,8 +152,13 @@ contract DEXRouter is IDEXRouter {
         (bool success, bytes memory data) = token.call(abi.encodeWithSelector(0x23b872dd, from, to, value));
         require(
             success && (data.length == 0 || abi.decode(data, (bool))),
-            'TransferHelper::transferFrom: transferFrom failed'
+            'Error: transferFrom failed'
         );
+    }
+
+    function safeTransferETH(address to, uint256 value) internal {
+        (bool success, ) = to.call{value: value}(new bytes(0));
+        require(success, 'Error: ETH transfer failed');
     }
 
 }

@@ -12,7 +12,10 @@ interface IDEXRouter {
      * @notice Returns the contract factory for the network
      * @return The address for factory contract
      */
-    function factory() external pure returns (address);
+    function factory() external view returns (address);
+
+    function WETH() external view returns (address);
+
 
     /**
      * @notice Quotes price for user
@@ -60,7 +63,7 @@ interface IDEXRouter {
         uint amountETHMin,
         address to,
         uint deadline
-    ) external returns (uint amountA, uint amountB);
+    ) external payable returns (uint amountToken, uint amountETH, uint liquidity);
 
     /**
      * @notice Allow liquidity providers to redeem assets for liquidity tokens
