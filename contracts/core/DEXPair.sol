@@ -5,6 +5,7 @@ import './interfaces/IDEXFactory.sol';
 import './interfaces/IDEXPair.sol';
 import '../token/MockERC20.sol';
 import '../libraries/Math.sol';
+import '../libraries/Transfer.sol';
 
 contract DEXPair is IDEXPair {
 
@@ -16,6 +17,7 @@ contract DEXPair is IDEXPair {
 
     uint  public totalSupply;
     mapping(address => uint) public balanceOf;
+    mapping(address => mapping(address => uint)) public allowance;
 
     uint112 private reserve0;
     uint112 private reserve1;
@@ -84,13 +86,27 @@ contract DEXPair is IDEXPair {
         // emit Sync(reserve0, reserve1);
     }
 
-    function Burn(address to) external returns (uint amount0, uint amount1) {
+    function burn(address to) external returns (uint amount0, uint amount1) {
 
     }
 
     function getReserves() public view returns (uint112 _reserve0, uint112 _reserve1) {
         _reserve0 = reserve0;
         _reserve1 = reserve1;
+    }
+
+    function transferFrom(address from, address to, uint value) external returns (bool) {
+        if (allowance[from][msg.sender] != type(uint256).max) {
+            allowance[from][msg.sender] = allowance[from][msg.sender] - value;
+        }
+        _transfer(from, to, value);
+        return true;
+    }
+
+    function _transfer(address from, address to, uint value) private {
+        balanceOf[from] = balanceOf[from]- value;
+        balanceOf[to] = balanceOf[to] + value;
+        // emit Transfer(from, to, value);
     }
 
 }

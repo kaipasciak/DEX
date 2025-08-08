@@ -4,6 +4,7 @@ pragma solidity ^0.8.28;
 import './interfaces/IDEXRouter.sol';
 import './DEXQuoter.sol';
 import '../token/IWETH.sol';
+import '../libraries/Transfer.sol';
 
 contract DEXRouter is IDEXRouter {
     address public immutable override factory;
@@ -77,8 +78,8 @@ contract DEXRouter is IDEXRouter {
         address pair = DEXQuoter.pairFor(factory, tokenA, tokenB);
 
         // Transfer
-        safeTransferFrom(tokenA, msg.sender, pair, amountA);
-        safeTransferFrom(tokenB, msg.sender, pair, amountB);
+        Transfer.safeTransferFrom(tokenA, msg.sender, pair, amountA);
+        Transfer.safeTransferFrom(tokenB, msg.sender, pair, amountB);
         liquidity = IDEXPair(pair).mint(to);
     }
 
@@ -100,11 +101,11 @@ contract DEXRouter is IDEXRouter {
             amountETHMin
         );
         address pair = DEXQuoter.pairFor(factory, token, WETH);
-        safeTransferFrom(token, msg.sender, pair, amountToken);
+        Transfer.safeTransferFrom(token, msg.sender, pair, amountToken);
         IWETH(WETH).deposit{value: amountETH}();
         assert(IWETH(WETH).transfer(pair, amountETH));
         liquidity = IDEXPair(pair).mint(to);
-        if (msg.value > amountETH) safeTransferETH(msg.sender, msg.value - amountETH);
+        if (msg.value > amountETH) Transfer.safeTransferETH(msg.sender, msg.value - amountETH);
     }
 
     function removeLiquidity(
@@ -115,7 +116,15 @@ contract DEXRouter is IDEXRouter {
         uint amountBMin,
         address to,
         uint deadline
-    ) external returns (uint amountA, uint amountB) {}
+    ) public override ensure(deadline) returns (uint amountA, uint amountB) {
+        address pair = DEXQuoter.pairFor(factory, tokenA, tokenB);
+        IDEXPair(pair).transferFrom(msg.sender, pair, liquidity);
+        (uint amount0, uint amount1) = IDEXPair(pair).burn(to);
+        (address token0,) = tokenA < tokenB ? (tokenA, tokenB) : (tokenB, tokenA);
+        (amountA, amountB) = tokenA == token0 ? (amount0, amount1) : (amount1, amount0);
+        require(amountA >= amountAMin, 'Error: Insufficient A amount');
+        require(amountB >= amountBMin, 'Error: Insufficient B amount');
+    }
 
     function removeLiquidityETH(
         address token,
@@ -143,22 +152,6 @@ contract DEXRouter is IDEXRouter {
 
     // Helper functions
 
-    function safeTransferFrom(address token,
-        address from,
-        address to,
-        uint256 value
-    ) internal {
-        // bytes4(keccak256(bytes('transferFrom(address,address,uint256)')));
-        (bool success, bytes memory data) = token.call(abi.encodeWithSelector(0x23b872dd, from, to, value));
-        require(
-            success && (data.length == 0 || abi.decode(data, (bool))),
-            'Error: transferFrom failed'
-        );
-    }
-
-    function safeTransferETH(address to, uint256 value) internal {
-        (bool success, ) = to.call{value: value}(new bytes(0));
-        require(success, 'Error: ETH transfer failed');
-    }
+    
 
 }

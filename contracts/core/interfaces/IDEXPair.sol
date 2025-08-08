@@ -34,7 +34,7 @@ interface IDEXPair {
      * @return amount0 Amounts sent to to of first asset
      * @return amount1 Amounts sent to to of second asset
      */
-    function Burn(address to) external returns (uint amount0, uint amount1);
+    function burn(address to) external returns (uint amount0, uint amount1);
 
     /**
      * @notice Called from factory to initialize pair contract shortly after deployment
@@ -47,6 +47,7 @@ interface IDEXPair {
      * @return reserve0 Amount in reserves for first token
      * @return reserve1 Amount in reserves for second token
      */
-    function getReserves() external view returns (uint reserve0, uint reserve1);
+    function getReserves() external view returns (uint112 reserve0, uint112 reserve1);
 
+    function transferFrom(address from, address to, uint value) external returns (bool);
 }
