@@ -149,6 +149,16 @@ contract DEXRouter is IDEXRouter {
     }
 
     // Swap Functions
+    function _swap(uint[] memory amounts, address[] memory path, address _to) private {
+        for (uint i; i < path.length - 1; i++) {
+            (address input, address output) = (path[i], path[i + 1]);
+            (address token0,) = input < output ? (input, output) : (output, input);
+            uint amountOut = amounts[i + 1];
+            (uint amount0Out, uint amount1Out) = input == token0 ? (uint(0), amountOut) : (amountOut, uint(0));
+            address to = i < path.length - 2 ? DEXQuoter.pairFor(factory, output, path[i + 2]) : _to;
+            IDEXPair(DEXQuoter.pairFor(factory, input, output)).swap(amount0Out, amount1Out, to, new bytes(0));
+        }
+    }
 
     function swapExactTokensForTokens(
         uint amountIn,
@@ -156,7 +166,12 @@ contract DEXRouter is IDEXRouter {
         address[] calldata path,
         address to,
         uint deadline
-    ) external returns (uint[] memory amounts) {}
+    ) external override ensure(deadline) returns (uint[] memory amounts) {
+        amounts = DEXQuoter.getAmountsOut(factory, amountIn, path);
+        require(amounts[amounts.length - 1] >= amountOutMin, 'Error: Insufficient output amount');
+        Transfer.safeTransferFrom(path[0], msg.sender, DEXQuoter.pairFor(factory, path[0], path[1]), amounts[0]);
+        _swap(amounts, path, to);
+    }
 
     function swapExactETHForTokens(uint amountOutMin, address[] calldata path, address to, uint deadline)
     external payable returns (uint[] memory amounts) {}

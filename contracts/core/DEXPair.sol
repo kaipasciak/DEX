@@ -44,7 +44,7 @@ contract DEXPair is IDEXPair {
         token1 = _token1;
     }
 
-    function Swap(uint amount0out, uint amount1out, address to, bytes calldata data) external {
+    function swap(uint amount0out, uint amount1out, address to, bytes calldata data) external {
 
     }
 
