@@ -3,7 +3,7 @@ pragma solidity ^0.8.28;
 
 import './interfaces/IDEXRouter.sol';
 import './DEXQuoter.sol';
-import '../token/IWETH.sol';
+import './interfaces/IWETH.sol';
 import '../libraries/Transfer.sol';
 
 contract DEXRouter is IDEXRouter {
@@ -22,6 +22,8 @@ contract DEXRouter is IDEXRouter {
         require(deadline >= block.timestamp, 'Error: Expired');
         _;
     }
+
+    // Liquidity Functions
 
     /**
      * @notice Call's the library's quote function
@@ -133,8 +135,20 @@ contract DEXRouter is IDEXRouter {
         uint amountETHMin,
         address to,
         uint deadline
-    ) external returns (uint amountToken, uint amountETH) {}
+    ) public override ensure(deadline) returns (uint amountToken, uint amountETH) {
+        (amountToken, amountETH) = removeLiquidity(
+            token,
+            WETH,
+            liquidity,
+            amountTokenMin,
+            amountETHMin,
+            address(this),
+            deadline
+        );
+        Transfer.safeTransfer(token, to, amountToken);
+    }
 
+    // Swap Functions
 
     function swapExactTokensForTokens(
         uint amountIn,
