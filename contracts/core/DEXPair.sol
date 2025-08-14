@@ -10,6 +10,7 @@ import '../libraries/Transfer.sol';
 contract DEXPair is IDEXPair {
 
     uint public constant MINIMUM_LIQUIDITY = 10**3;
+    bytes4 private constant SELECTOR = bytes4(keccak256(bytes('transfer(address,uint256)')));
 
     address public factory;
     address public token0;
@@ -44,8 +45,33 @@ contract DEXPair is IDEXPair {
         token1 = _token1;
     }
 
-    function swap(uint amount0out, uint amount1out, address to, bytes calldata data) external {
+    function swap(uint amount0Out, uint amount1Out, address to, bytes calldata data) external lock {
+        require(amount0Out > 0 || amount1Out > 0, 'Error: Insufficient amount');
+        (uint112 _reserve0, uint112 _reserve1) = getReserves();
+        require(amount0Out < _reserve0 && amount1Out < _reserve1, 'Error: Insufficient Liquidity');
 
+        uint balance0;
+        uint balance1;
+        {
+            address _token0 = token0;
+            address _token1 = token1;
+            require(to != _token0 && to != _token1, 'Error: Invalid to');
+            if (amount0Out > 0) _safeTransfer(_token0, to, amount0Out); 
+            if (amount1Out > 0) _safeTransfer(_token1, to, amount1Out); 
+            balance0 = MockERC20(_token0).balanceOf(address(this));
+            balance1 = MockERC20(_token1).balanceOf(address(this));
+        }
+        uint amount0In = balance0 > _reserve0 - amount0Out ? balance0 - (_reserve0 - amount0Out) : 0;
+        uint amount1In = balance1 > _reserve1 - amount1Out ? balance1 - (_reserve1 - amount1Out) : 0;
+        require(amount0In > 0 || amount1In > 0, 'Error: Insufficient amount');
+        
+        {
+        uint balance0Adjusted = (balance0 * 1000) - (amount0In * 3);
+        uint balance1Adjusted = (balance1 * 1000) - (amount1In * 3);
+        require(balance0Adjusted * balance1Adjusted >= (uint(_reserve0 *_reserve1) * 1000**2), 'Error: K');
+        }
+
+        _update(balance0, balance1);
     }
 
     function mint(address to) external lock returns (uint liquidity) {
@@ -107,6 +133,11 @@ contract DEXPair is IDEXPair {
         balanceOf[from] = balanceOf[from]- value;
         balanceOf[to] = balanceOf[to] + value;
         // emit Transfer(from, to, value);
+    }
+
+    function _safeTransfer(address token, address to, uint value) private {
+        (bool success, bytes memory data) = token.call(abi.encodeWithSelector(SELECTOR, to, value));
+        require(success && (data.length == 0 || abi.decode(data, (bool))), 'Error: Transfer Failed');
     }
 
 }
