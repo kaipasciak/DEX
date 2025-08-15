@@ -45,7 +45,7 @@ contract DEXPair is IDEXPair {
         token1 = _token1;
     }
 
-    function swap(uint amount0Out, uint amount1Out, address to, bytes calldata data) external lock {
+    function swap(uint amount0Out, uint amount1Out, address to) external lock {
         require(amount0Out > 0 || amount1Out > 0, 'Error: Insufficient amount');
         (uint112 _reserve0, uint112 _reserve1) = getReserves();
         require(amount0Out < _reserve0 && amount1Out < _reserve1, 'Error: Insufficient Liquidity');

@@ -156,10 +156,11 @@ contract DEXRouter is IDEXRouter {
             uint amountOut = amounts[i + 1];
             (uint amount0Out, uint amount1Out) = input == token0 ? (uint(0), amountOut) : (amountOut, uint(0));
             address to = i < path.length - 2 ? DEXQuoter.pairFor(factory, output, path[i + 2]) : _to;
-            IDEXPair(DEXQuoter.pairFor(factory, input, output)).swap(amount0Out, amount1Out, to, new bytes(0));
+            IDEXPair(DEXQuoter.pairFor(factory, input, output)).swap(amount0Out, amount1Out, to);
         }
     }
 
+    // User calls IERC20(tokenIn).approve(router addr, amountIn) for the first transfer below to work
     function swapExactTokensForTokens(
         uint amountIn,
         uint amountOutMin,
@@ -174,10 +175,25 @@ contract DEXRouter is IDEXRouter {
     }
 
     function swapExactETHForTokens(uint amountOutMin, address[] calldata path, address to, uint deadline)
-    external payable returns (uint[] memory amounts) {}
+    external override ensure(deadline) payable returns (uint[] memory amounts) {
+        require(path[0] == WETH, 'Error: Invalid path');
+        amounts = DEXQuoter.getAmountsOut(factory, msg.value, path);
+        require(amounts[amounts.length - 1] >= amountOutMin, 'Insufficient output amount');
+        IWETH(WETH).deposit{value: amounts[0]}();
+        assert(IWETH(WETH).transfer(DEXQuoter.pairFor(factory, path[0], path[1]), amounts[0]));
+        _swap(amounts, path, to);
+    }
 
     function swapExactTokensForETH(uint amountIn, uint amountOutMin, address[] calldata path, address to, uint deadline)
-    external payable returns (uint[] memory amounts) {}
+    external override ensure(deadline) payable returns (uint[] memory amounts) {
+        require(path[path.length - 1] == WETH, 'Error: Invalid path');
+        amounts = DEXQuoter.getAmountsOut(factory, amountIn, path);
+        require(amounts[amounts.length - 1] >= amountOutMin, 'Error: Insufficient output amount');
+        Transfer.safeTransferFrom(path[0], msg.sender, DEXQuoter.pairFor(factory, path[0], path[1]), amounts[0]);
+        _swap(amounts, path, address(this));
+        IWETH(WETH).withdraw(amounts[amounts.length - 1]);
+        Transfer.safeTransferETH(to, amounts[amounts.length - 1]);
+    }
 
     // Helper functions
 

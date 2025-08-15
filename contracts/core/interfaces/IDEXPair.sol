@@ -17,9 +17,8 @@ interface IDEXPair {
      * @param amount0out Amount of token 1 output
      * @param amount1out Amount of token 2 output
      * @param to Address for output to be sent
-     * @param data May be omitted, this is just for flash swaps
      */
-    function swap(uint amount0out, uint amount1out, address to, bytes calldata data) external;
+    function swap(uint amount0out, uint amount1out, address to) external;
 
     /**
      *  @notice Issues pool tokens to liquidity providers after depositing liquidity
