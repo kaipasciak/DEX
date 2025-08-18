@@ -14,8 +14,9 @@ contract DEXRouter is IDEXRouter {
      * @notice Factory address is set on construction
      * @param _factory Address of the factory contract
      */
-    constructor(address _factory) {
+    constructor(address _factory, address _WETH) {
         factory = _factory;
+        WETH = _WETH;
     }
 
     modifier ensure(uint deadline) {

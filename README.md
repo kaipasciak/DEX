@@ -30,9 +30,21 @@ TODO: Finish
 ## Frontend Description
 
 ## Local Setup and Usage
+Start ganache blockchain with the following line
+`ganache --mnemonic "test test test test test test test test test test test junk"`
+Compile contracts and deploy them with the following lines
+`npx hardhat compile`
+`npx hardhat run scripts/deploy.js --network ganache`
 Work in progress
+Run launch.py from command line
+
+TODO: Write deploy script and python script
+
+
+
 
 ## To-do
-- Implement swap in pair
-- Consider turning all ints to 256 since twap (and therefore floating point numbers) won't be implemented
+- Figure out how to deploy onto ganache blockchain using hardhat project deploy script
+
+
 
