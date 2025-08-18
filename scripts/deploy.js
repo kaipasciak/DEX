@@ -36,17 +36,9 @@ async function main () {
     ]);
     await Router.waitForDeployment();
     console.log("Router deployed at: ", await Router.getAddress());
-
-    
-
-
-
-
-
-
-
-
-
-
-
 }
+
+main().catch((error) => {
+    console.error(error);
+    process.exitCode = 1;
+  });
