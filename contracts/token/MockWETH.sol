@@ -4,6 +4,9 @@ pragma solidity ^0.8.28;
 import './MockERC20.sol';
 import '../periphery/interfaces/IWETH.sol';
 
+
+// From WETH Smart Contract
+// 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2
 contract MockWETH is IWETH {
     string public name     = "Wrapped Ether";
     string public symbol   = "WETH";

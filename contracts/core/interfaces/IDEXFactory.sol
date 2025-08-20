@@ -8,7 +8,7 @@ pragma solidity ^0.8.28;
  */
 interface IDEXFactory {
     /// @notice Emits an event when a new pair is created
-    event PairCreated(address indexed token0, address indexed token1, address pair, uint);
+    // event PairCreated(address indexed token0, address indexed token1, address pair, uint);
 
     /**
      * @notice Validates input addresses and creates pair if not yet created

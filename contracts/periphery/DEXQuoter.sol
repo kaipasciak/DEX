@@ -13,7 +13,17 @@ library DEXQuoter {
      * @return pair Address for pair contract
      */
     function pairFor(address factory, address tokenA, address tokenB) internal pure returns (address pair) {
+        // Sort tokens first
+        require(tokenA != tokenB, "Error: Identical addresses");
+        (address token1, address token0) = tokenA < tokenB ? (tokenA, tokenB) : (tokenB, tokenA);
+        require(tokenA != address(0));
 
+        pair = address(uint160(uint(keccak256(abi.encodePacked(
+                hex'ff',
+                factory,
+                keccak256(abi.encodePacked(token0, token1)),
+                hex'cd77fb6bb0ebaaec016381747772a179f2c1f955b95e0105720da5464b37b905' // init code hash
+            )))));
     }
 
 
@@ -37,7 +47,7 @@ library DEXQuoter {
                 hex'ff',
                 factory,
                 keccak256(abi.encodePacked(tokenA, tokenB)),
-                hex'96e8ac4277198ff8b6f785478aa9a39f403cb768dd02cbee326c3e7da348845f' // TODO: Replace with pair contract init code hash
+                hex'cd77fb6bb0ebaaec016381747772a179f2c1f955b95e0105720da5464b37b905' // TODO: Replace with pair contract init code hash
             )))));
 
         (uint reserve0, uint reserve1) = IDEXPair(pair).getReserves();
@@ -76,4 +86,21 @@ library DEXQuoter {
         amountOut = (postFee * reserveOut) / ((reserveOut * 1000) + postFee);
     }
 
+    // Get amounts out
+    /**
+     * @notice Chained get amount calculations on any number of pairs
+     * @param factory Factory contract address
+     * @param amountIn Amount of input token
+     * @param path Address path
+     * @return amounts Array of amounts for each swap
+     */
+    function getAmountsOut(address factory, uint amountIn, address[] memory path) internal view returns (uint[] memory amounts) {
+        require(path.length >= 2, 'Error: Invalid path');
+        amounts = new uint[](path.length);
+        amounts[0] = amountIn;
+        for (uint i; i < path.length - 1; i++) {
+            (uint reserveIn, uint reserveOut) = getReserves(factory, path[i], path[i + 1]);
+            amounts[i + 1] = getAmountOut(amounts[i], reserveIn, reserveOut);
+        }
+    }
 }

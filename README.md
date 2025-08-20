@@ -25,6 +25,11 @@ Scripting: Python
 The smart contracts are divided into core and periphery contracts. The core contracts include `DEXFactory.sol` and `DEXPair.sol`. The periphery contracts include `DEXRouter.sol` and `DEXQuoter.sol`.
 The factory creates and manages pair contracts, and pair contracts represent a unique liquidity pool token for a given pair of tokens to be swapped. The router simplifies swaps and liquidity management for users and dApps, and the quoter is a library that provides utility functions for pricing and data fetching.
 
+The quoter, to keep all of the functions pure, uses create2 to determine the pair contract address ina  couple
+of its functions for a given pair. A script was written for this to get the init code of the pair contract. It
+can be run from the command line as follows:
+npx hardhat run scripts/PairInitCodeHash.js
+
 TODO: Finish
 
 ## Frontend Description
@@ -45,6 +50,10 @@ TODO: Write deploy script and python script
 
 ## To-do
 - Figure out how to deploy onto ganache blockchain using hardhat project deploy script
+- Write test script and debug deploy script if needed
+- Write launch.py to interact with dApp through python
+- Write launch2.py to interact with dApp through locally hosted frontend
+
 
 
 

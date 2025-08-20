@@ -7,7 +7,7 @@ module.exports = {
     ganache: {
       url: "http://127.0.0.1:8545",
       chainId: 1337,
-      // Put account info here
+      mnemonic: "test test test test test test test test test test test junk"
     }
   }
 };

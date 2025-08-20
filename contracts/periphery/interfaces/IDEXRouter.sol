@@ -7,7 +7,7 @@ pragma solidity ^0.8.28;
  * @notice Simplifies swaps and liquidity management for users and dApps
  */
 interface IDEXRouter {
-    // Pure functions 
+    // View functions 
     /**
      * @notice Returns the contract factory for the network
      * @return The address for factory contract
