@@ -1,5 +1,5 @@
-// TODO: write this script
-const hre = require("hardhat"); 
+
+import hre from "hardhat";
 
 async function main () {
     // First account from ganache network will deploy contracts and mint mock ERC20 tokens

@@ -48,4 +48,9 @@ contract MockWETH is IWETH {
 
         return true;
     }
+
+    function approve(address guy, uint wad) public returns (bool) {
+        allowance[msg.sender][guy] = wad;
+        return true;
+    }
 }

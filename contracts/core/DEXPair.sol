@@ -112,8 +112,31 @@ contract DEXPair is IDEXPair {
         // emit Sync(reserve0, reserve1);
     }
 
-    function burn(address to) external returns (uint amount0, uint amount1) {
+    function burn(address to) external lock returns (uint amount0, uint amount1) {
+        
+        address _token0 = token0;                           
+        address _token1 = token1;
 
+        uint balance0 = MockERC20(_token0).balanceOf(address(this));
+        uint balance1 = MockERC20(_token1).balanceOf(address(this));
+        uint liquidity = balanceOf[address(this)];
+
+        uint _totalSupply = totalSupply;
+        amount0 = (liquidity * balance0) / _totalSupply;
+        amount1 = (liquidity * balance1) / _totalSupply;
+        require(amount0 > 0 && amount1 > 0, 'Error: Insufficient liquidity burned');
+        _burn(address(this), liquidity);
+        _safeTransfer(_token0, to, amount0);
+        _safeTransfer(_token1, to, amount1);
+        balance0 = MockERC20(_token0).balanceOf(address(this));
+        balance1 = MockERC20(_token1).balanceOf(address(this));
+
+        _update(balance0, balance1);
+    }
+
+    function _burn(address from, uint value) internal {
+        balanceOf[from] = balanceOf[from] - value;
+        totalSupply = totalSupply - value;
     }
 
     function getReserves() public view returns (uint112 _reserve0, uint112 _reserve1) {
