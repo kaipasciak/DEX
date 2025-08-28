@@ -15,14 +15,14 @@ library DEXQuoter {
     function pairFor(address factory, address tokenA, address tokenB) internal pure returns (address pair) {
         // Sort tokens first
         require(tokenA != tokenB, "Error: Identical addresses");
-        (address token1, address token0) = tokenA < tokenB ? (tokenA, tokenB) : (tokenB, tokenA);
+        (address token0, address token1) = tokenA < tokenB ? (tokenA, tokenB) : (tokenB, tokenA);
         require(tokenA != address(0));
 
         pair = address(uint160(uint(keccak256(abi.encodePacked(
                 hex'ff',
                 factory,
                 keccak256(abi.encodePacked(token0, token1)),
-                hex'cd77fb6bb0ebaaec016381747772a179f2c1f955b95e0105720da5464b37b905' // init code hash
+                hex'1b59548e5075ef892bca3770df21f05777ec52e10dadfa0461069a2bde38b20e' // init code hash
             )))));
     }
 
@@ -47,7 +47,7 @@ library DEXQuoter {
                 hex'ff',
                 factory,
                 keccak256(abi.encodePacked(tokenA, tokenB)),
-                hex'cd77fb6bb0ebaaec016381747772a179f2c1f955b95e0105720da5464b37b905' // TODO: Replace with pair contract init code hash
+                hex'1b59548e5075ef892bca3770df21f05777ec52e10dadfa0461069a2bde38b20e' // TODO: Replace with pair contract init code hash
             )))));
 
         (uint reserve0, uint reserve1) = IDEXPair(pair).getReserves();

@@ -1,0 +1,133 @@
+import { expect } from "chai";
+import hre from "hardhat";
+const { ethers } = hre;
+
+describe("DEX Factory Functionality", function() {
+    // Signer declarations
+    let deployer, alice, bob;
+
+    // DEX contract declarations
+    let Factory, Router;
+
+    // Token declarations
+    let TokenA, TokenB, WETH;
+
+    // Address declarations
+    let TokenAAddr, TokenBAddr, WETHAddr, FactoryAddr, RouterAddr;
+
+
+    before(async function() {
+        
+        // Assignments
+        // Signers
+        [deployer, alice, bob] = await ethers.getSigners();
+
+        // Tokens
+        TokenA = await ethers.deployContract("MockERC20", [
+            "Token A",
+            "AAA",
+            18,
+            ethers.parseUnits("1000000", 18)
+        ], { signer: deployer });
+        await TokenA.waitForDeployment();
+        TokenAAddr = await TokenA.getAddress();
+        console.log("TokenA deployed at: ", TokenAAddr);
+
+        TokenB = await ethers.deployContract("MockERC20", [
+            "Token B",
+            "BBB",
+            18,
+            ethers.parseUnits("1000000", 18)
+        ], { signer: deployer });
+        await TokenB.waitForDeployment();
+        TokenBAddr = await TokenB.getAddress();
+        console.log("TokenB deployed at: ", TokenBAddr);
+
+        WETH = await hre.ethers.deployContract("MockWETH");
+        await WETH.waitForDeployment();
+        WETHAddr = await WETH.getAddress();
+        console.log("WETH deployed at: ", WETHAddr);
+
+        // Contracts
+        Factory = await hre.ethers.deployContract("DEXFactory", { signer: deployer });
+        await Factory.waitForDeployment();
+        FactoryAddr = await Factory.getAddress();
+        console.log("Factory deployed at: ", FactoryAddr);
+
+        Router = await hre.ethers.deployContract("DEXRouter", [
+            await Factory.getAddress(),
+            await WETH.getAddress()
+        ]);
+        await Router.waitForDeployment();
+        RouterAddr = await Router.getAddress();
+        console.log("Router deployed at: ", RouterAddr);
+    });
+
+    // Adding liquidity
+    // Removing liquidity
+    describe("Liquidity functions", function() {
+        it("Should allow a user to add liquidity to a token/token pair contract not yet created", async function() {
+            await TokenA.connect(alice).mint(alice.address, ethers.parseUnits("1000", 18));
+            await TokenB.connect(alice).mint(alice.address, ethers.parseUnits("1000", 18));
+            const latestBlock = await ethers.provider.getBlock("latest");
+            const deadline = latestBlock.timestamp + 10000;
+            // Alice has to approve funds for Router before adding liquidity
+            await TokenA.connect(alice).approve(RouterAddr, ethers.parseUnits("120", 18));
+            await TokenB.connect(alice).approve(RouterAddr, ethers.parseUnits("120", 18));
+
+            await Router.connect(alice).addLiquidity(TokenAAddr, TokenBAddr, ethers.parseUnits("100", 18), 
+            ethers.parseUnits("100", 18), ethers.parseUnits("90", 18), ethers.parseUnits("90", 18), alice.address, deadline);
+
+
+            const pairAddr = await Factory.getPair(TokenAAddr, TokenBAddr);
+            const pair = await ethers.getContractAt("DEXPair", pairAddr);
+            // debug print
+            console.log("Pair address:", pair);
+            const code = await ethers.provider.getCode(pair);
+            console.log("Pair code length:", code.length);
+
+
+            
+            // Get pair address and check Alice balance
+            
+            const lpBalance = await pair.balanceOf(alice.address);
+            expect(lpBalance).to.be.gt(0n);
+        });
+
+        it("Should allow a user to add liquidity to existing token/token pair contract", async function() {
+            
+        });
+
+        it("Should allow a user to remove liquidity", async function() {
+
+        });
+    })
+
+    describe("Liquidity functions", function() {
+        it("Should allow a user to add liquidity to a token/eth pair contract not yet created", async function() {
+            await TokenA.connect(alice).mint(alice.address, ethers.parseUnits("1000", 18));
+            await TokenB.connect(alice).mint(alice.address, ethers.parseUnits("1000", 18));
+            
+        });
+
+        it("Should allow a user to add liquidity to existing token/eth pair contract", async function() {
+            
+        });
+
+        it("Should allow a user to remove liquidity", async function() {
+
+        });
+    })
+
+
+    // Swap: TokenA and TokenB will have a pair contract. TokenA and TokenC will not, and will require
+    // multiple hops to swap
+
+    // Swap token for token
+    // Swap ETH for token
+    // Swap token for ETH
+    // Multihop swap
+
+    
+
+});

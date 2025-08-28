@@ -105,10 +105,10 @@ contract DEXPair is IDEXPair {
     function _update(uint balance0, uint balance1) private {
         // Workaround for older version of uniswap
         require(balance0 <= type(uint112).max && balance1 <= type(uint112).max, "Error: Overflow");
-        price0 = (reserve1 * 1e18) / reserve0;
-        price1 = (reserve0 * 1e18) / reserve1;
         reserve0 = uint112(balance0);
         reserve1 = uint112(balance1);
+        price0 = reserve0 > 0 ? (uint256(reserve1) * 1e18) / reserve0 : 0;
+        price1 = reserve1 > 0 ? (uint256(reserve0) * 1e18) / reserve1 : 0;
         // emit Sync(reserve0, reserve1);
     }
 

@@ -3,7 +3,8 @@
   "devDependencies": {
     "@nomicfoundation/hardhat-chai-matchers": "^2.1.0",
     "@nomicfoundation/hardhat-toolbox": "^6.1.0",
-    "chai": "^4.5.0"
+    "chai": "^4.5.0",
+    "source-map-support": "^0.5.21"
   },
   "dependencies": {
     "@openzeppelin/contracts": "^5.4.0",
@@ -12,4 +13,5 @@
   "scripts": {
     "ganache": "ganache --wallet.seed myCustomSeed"
   }
+  
 }
