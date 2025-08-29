@@ -145,7 +145,7 @@ contract DEXPair is IDEXPair {
     }
 
     function transferFrom(address from, address to, uint value) external returns (bool) {
-        if (allowance[from][msg.sender] != type(uint256).max) {
+        if (allowance[from][msg.sender] != type(uint256).max && allowance[from][msg.sender] >= value) {
             allowance[from][msg.sender] = allowance[from][msg.sender] - value;
         }
         _transfer(from, to, value);

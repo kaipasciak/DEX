@@ -65,7 +65,9 @@ describe("DEX Factory Functionality", function() {
 
     // Adding liquidity
     // Removing liquidity
-    describe("Liquidity functions", function() {
+    describe("Token/token liquidity functions", function() {
+        let aliceLpBalance;
+
         it("Should allow a user to add liquidity to a token/token pair contract not yet created", async function() {
             await TokenA.connect(alice).mint(alice.address, ethers.parseUnits("1000", 18));
             await TokenB.connect(alice).mint(alice.address, ethers.parseUnits("1000", 18));
@@ -74,36 +76,44 @@ describe("DEX Factory Functionality", function() {
             // Alice has to approve funds for Router before adding liquidity
             await TokenA.connect(alice).approve(RouterAddr, ethers.parseUnits("120", 18));
             await TokenB.connect(alice).approve(RouterAddr, ethers.parseUnits("120", 18));
-
             await Router.connect(alice).addLiquidity(TokenAAddr, TokenBAddr, ethers.parseUnits("100", 18), 
             ethers.parseUnits("100", 18), ethers.parseUnits("90", 18), ethers.parseUnits("90", 18), alice.address, deadline);
-
-
-            const pairAddr = await Factory.getPair(TokenAAddr, TokenBAddr);
-            const pair = await ethers.getContractAt("DEXPair", pairAddr);
-            // debug print
-            console.log("Pair address:", pair);
-            const code = await ethers.provider.getCode(pair);
-            console.log("Pair code length:", code.length);
-
-
             
             // Get pair address and check Alice balance
-            
-            const lpBalance = await pair.balanceOf(alice.address);
-            expect(lpBalance).to.be.gt(0n);
+            const pairAddr = await Factory.getPair(TokenAAddr, TokenBAddr);
+            const pair = await ethers.getContractAt("DEXPair", pairAddr);
+            aliceLpBalance = await pair.balanceOf(alice.address);
+            expect(aliceLpBalance).to.be.gt(0n);
         });
 
         it("Should allow a user to add liquidity to existing token/token pair contract", async function() {
-            
+            const latestBlock = await ethers.provider.getBlock("latest");
+            const deadline = latestBlock.timestamp + 10000;
+            await TokenA.connect(deployer).approve(RouterAddr, ethers.parseUnits("120", 18));
+            await TokenB.connect(deployer).approve(RouterAddr, ethers.parseUnits("120", 18));
+            await Router.connect(deployer).addLiquidity(TokenAAddr, TokenBAddr, ethers.parseUnits("100", 18), 
+            ethers.parseUnits("100", 18), ethers.parseUnits("90", 18), ethers.parseUnits("90", 18), deployer.address, deadline);
+            // Get pair address and check Alice balance
+            const pairAddr = await Factory.getPair(TokenAAddr, TokenBAddr);
+            const pair = await ethers.getContractAt("DEXPair", pairAddr);
+            const lpBalance = await pair.balanceOf(deployer.address);
+            expect(lpBalance).to.be.gt(0n);
         });
 
         it("Should allow a user to remove liquidity", async function() {
-
+            let aliceStartingBalance = await TokenA.balanceOf(alice.address);
+            const latestBlock = await ethers.provider.getBlock("latest");
+            const deadline = latestBlock.timestamp + 10000;
+            await Router.connect(alice).removeLiquidity(TokenAAddr, TokenBAddr, aliceLpBalance, ethers.parseUnits("90", 18),
+            ethers.parseUnits("90", 18), alice.address, deadline);
+            let aliceEndingBalance = await TokenA.balanceOf(alice.address);
+            expect(aliceEndingBalance).to.be.gt(aliceStartingBalance);
+            console.log("Starting balance: ", ethers.formatUnits(aliceStartingBalance));
+            console.log("Ending balance: ", ethers.formatUnits(aliceEndingBalance));
         });
     })
 
-    describe("Liquidity functions", function() {
+    describe("Token/ETH liquidity functions", function() {
         it("Should allow a user to add liquidity to a token/eth pair contract not yet created", async function() {
             await TokenA.connect(alice).mint(alice.address, ethers.parseUnits("1000", 18));
             await TokenB.connect(alice).mint(alice.address, ethers.parseUnits("1000", 18));

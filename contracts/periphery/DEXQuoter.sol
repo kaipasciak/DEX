@@ -22,7 +22,7 @@ library DEXQuoter {
                 hex'ff',
                 factory,
                 keccak256(abi.encodePacked(token0, token1)),
-                hex'1b59548e5075ef892bca3770df21f05777ec52e10dadfa0461069a2bde38b20e' // init code hash
+                hex'9fb3111e362141295e95e23bb9d6271409a6b0af2d3b73c8145899ebd8fb86af' // init code hash
             )))));
     }
 
@@ -47,7 +47,7 @@ library DEXQuoter {
                 hex'ff',
                 factory,
                 keccak256(abi.encodePacked(tokenA, tokenB)),
-                hex'1b59548e5075ef892bca3770df21f05777ec52e10dadfa0461069a2bde38b20e' // TODO: Replace with pair contract init code hash
+                hex'9fb3111e362141295e95e23bb9d6271409a6b0af2d3b73c8145899ebd8fb86af' // TODO: Replace with pair contract init code hash
             )))));
 
         (uint reserve0, uint reserve1) = IDEXPair(pair).getReserves();
