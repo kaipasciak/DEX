@@ -69,8 +69,8 @@ describe("DEX Factory Functionality", function() {
         let aliceLpBalance;
 
         it("Should allow a user to add liquidity to a token/token pair contract not yet created", async function() {
-            await TokenA.connect(alice).mint(alice.address, ethers.parseUnits("1000", 18));
-            await TokenB.connect(alice).mint(alice.address, ethers.parseUnits("1000", 18));
+            await TokenA.connect(alice).mint(alice.address, ethers.parseUnits("1500", 18));
+            await TokenB.connect(alice).mint(alice.address, ethers.parseUnits("1500", 18));
             const latestBlock = await ethers.provider.getBlock("latest");
             const deadline = latestBlock.timestamp + 10000;
             // Alice has to approve funds for Router before adding liquidity
@@ -115,8 +115,20 @@ describe("DEX Factory Functionality", function() {
 
     describe("Token/ETH liquidity functions", function() {
         it("Should allow a user to add liquidity to a token/eth pair contract not yet created", async function() {
-            await TokenA.connect(alice).mint(alice.address, ethers.parseUnits("1000", 18));
-            await TokenB.connect(alice).mint(alice.address, ethers.parseUnits("1000", 18));
+            
+            // Add liquidity
+            const latestBlock = await ethers.provider.getBlock("latest");
+            const deadline = latestBlock.timestamp + 10000;
+            await TokenA.connect(alice).approve(RouterAddr, ethers.parseUnits("100", 18));
+            await Router.connect(alice).addLiquidityETH(TokenAAddr, ethers.parseUnits("90", 18),
+            ethers.parseUnits("80", 18), ethers.parseEther("0.9"), alice.address, deadline, { value: ethers.parseEther("1.0")});
+
+            // Check existence of pair contract and Alice's balance
+            // Get pair address and check Alice balance
+            const pairAddr = await Factory.getPair(TokenAAddr, WETHAddr);
+            const pair = await ethers.getContractAt("DEXPair", pairAddr);
+            let aliceLpBalance = await pair.balanceOf(alice.address);
+            expect(aliceLpBalance).to.be.gt(0n);
             
         });
 
