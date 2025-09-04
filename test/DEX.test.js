@@ -114,11 +114,14 @@ describe("DEX Factory Functionality", function() {
     })
 
     describe("Token/ETH liquidity functions", function() {
+        let aliceLpBalance;
+
         it("Should allow a user to add liquidity to a token/eth pair contract not yet created", async function() {
             
             // Add liquidity
             const latestBlock = await ethers.provider.getBlock("latest");
             const deadline = latestBlock.timestamp + 10000;
+
             await TokenA.connect(alice).approve(RouterAddr, ethers.parseUnits("100", 18));
             await Router.connect(alice).addLiquidityETH(TokenAAddr, ethers.parseUnits("90", 18),
             ethers.parseUnits("80", 18), ethers.parseEther("0.9"), alice.address, deadline, { value: ethers.parseEther("1.0")});
@@ -127,17 +130,46 @@ describe("DEX Factory Functionality", function() {
             // Get pair address and check Alice balance
             const pairAddr = await Factory.getPair(TokenAAddr, WETHAddr);
             const pair = await ethers.getContractAt("DEXPair", pairAddr);
-            let aliceLpBalance = await pair.balanceOf(alice.address);
+            aliceLpBalance = await pair.balanceOf(alice.address);
             expect(aliceLpBalance).to.be.gt(0n);
             
         });
 
+        it("test", async function() {
+            const pairAddr = await Factory.getPair(TokenAAddr, WETHAddr);
+            const pair = await ethers.getContractAt("DEXPair", pairAddr);
+            const [reserveA, reserveWETH] = await pair.getReserves();
+            console.log([ethers.formatEther(reserveA.toString()), ethers.formatEther(reserveWETH.toString())]);
+        });
+
         it("Should allow a user to add liquidity to existing token/eth pair contract", async function() {
             
+            // Add liquidity from deployer address
+            const latestBlock = await ethers.provider.getBlock("latest");
+            const deadline = latestBlock.timestamp + 1000;
+
+            await TokenA.connect(deployer).approve(RouterAddr, ethers.parseUnits("100", 18));
+            await Router.connect(deployer).addLiquidityETH(TokenAAddr, ethers.parseUnits("90", 18),
+            ethers.parseUnits("10", 18), ethers.parseEther("1.0"), deployer.address, deadline, { value: ethers.parseEther("1.0") });
+
+            // Get pair address and check deployer's balance
+            const pairAddr = await Factory.getPair(TokenAAddr, WETHAddr);
+            const pair = await ethers.getContractAt("DEXPair", pairAddr);
+            let lpBalance = await pair.balanceOf(deployer.address);
+            expect(lpBalance).to.be.gt(0n);
         });
 
         it("Should allow a user to remove liquidity", async function() {
+            let aliceStartingBalance = await TokenA.balanceOf(alice.address);
+            const latestBlock = await ethers.provider.getBlock("latest");
+            const deadline = latestBlock.timestamp + 1000;
 
+            await Router.connect(alice).removeLiquidityETH(TokenAAddr, aliceLpBalance, ethers.parseUnits("85", 18), ethers.parseEther("0.9"), alice.address, deadline);
+            let aliceEndingBalance = await TokenA.balanceOf(alice.address);
+            console.log("Alice starting balance: ", aliceStartingBalance);
+            console.log("Alice ending balance: ", aliceEndingBalance);
+            expect(aliceEndingBalance).to.be.gt(aliceStartingBalance);
+        
         });
     })
 

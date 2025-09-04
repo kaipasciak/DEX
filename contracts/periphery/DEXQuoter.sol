@@ -67,7 +67,7 @@ library DEXQuoter {
         require(reserveA > 0, "Error: Insufficient liquidity");
         require(reserveB > 0, "Error: Insufficient liquidity");
 
-        amountB = (reserveB / reserveA) * amountA;
+        amountB = (reserveB * amountA) / reserveA;
     }
 
     // Get amount out

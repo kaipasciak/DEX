@@ -24,6 +24,8 @@ contract DEXRouter is IDEXRouter {
         _;
     }
 
+    event Amounts(uint min, uint optimal, uint desired);
+
     // Liquidity Functions
 
     /**
@@ -55,7 +57,7 @@ contract DEXRouter is IDEXRouter {
         }
         else {
             uint amountBOptimal = DEXQuoter.quote(amountADesired, reserveA, reserveB);
-            if (amountBOptimal <= amountADesired) {
+            if (amountBOptimal <= amountBDesired) {
                 require(amountBOptimal >= amountBMin, "Error: Insufficient B amount");
                 (amountA, amountB) = (amountADesired, amountBOptimal);
             } else {
