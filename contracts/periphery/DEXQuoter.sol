@@ -22,7 +22,7 @@ library DEXQuoter {
                 hex'ff',
                 factory,
                 keccak256(abi.encodePacked(token0, token1)),
-                hex'9fb3111e362141295e95e23bb9d6271409a6b0af2d3b73c8145899ebd8fb86af' // init code hash
+                hex'0d98236b38909c9fbc41615b6dfcc8ca761f0064c1741cf769d076608b747080' // init code hash
             )))));
     }
 
@@ -47,7 +47,7 @@ library DEXQuoter {
                 hex'ff',
                 factory,
                 keccak256(abi.encodePacked(tokenA, tokenB)),
-                hex'9fb3111e362141295e95e23bb9d6271409a6b0af2d3b73c8145899ebd8fb86af' // TODO: Replace with pair contract init code hash
+                hex'0d98236b38909c9fbc41615b6dfcc8ca761f0064c1741cf769d076608b747080' // TODO: Replace with pair contract init code hash
             )))));
 
         (uint reserve0, uint reserve1) = IDEXPair(pair).getReserves();
@@ -83,7 +83,7 @@ library DEXQuoter {
         require(amountIn > 0, "Error: Invalid input amount");
 
         uint postFee = amountIn * 997;
-        amountOut = (postFee * reserveOut) / ((reserveOut * 1000) + postFee);
+        amountOut = (postFee * reserveOut) / ((reserveIn * 1000) + postFee);
     }
 
     // Get amounts out

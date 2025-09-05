@@ -166,8 +166,8 @@ describe("DEX Factory Functionality", function() {
 
             await Router.connect(alice).removeLiquidityETH(TokenAAddr, aliceLpBalance, ethers.parseUnits("85", 18), ethers.parseEther("0.9"), alice.address, deadline);
             let aliceEndingBalance = await TokenA.balanceOf(alice.address);
-            console.log("Alice starting balance: ", aliceStartingBalance);
-            console.log("Alice ending balance: ", aliceEndingBalance);
+            console.log("Alice starting balance: ", ethers.formatEther(aliceStartingBalance.toString()));
+            console.log("Alice ending balance: ", ethers.formatEther(aliceEndingBalance.toString()));
             expect(aliceEndingBalance).to.be.gt(aliceStartingBalance);
         
         });
@@ -177,10 +177,56 @@ describe("DEX Factory Functionality", function() {
     // Swap: TokenA and TokenB will have a pair contract. TokenA and TokenC will not, and will require
     // multiple hops to swap
 
-    // Swap token for token
-    // Swap ETH for token
-    // Swap token for ETH
-    // Multihop swap
+    
+    describe("Swap functions", async function () {
+        // Swap token for token
+        it("Should allow Bob to swap Token A for Token B", async function() {
+            // Start by giving Bob 100 Token A
+            await TokenA.connect(deployer).mint(bob.address, ethers.parseUnits("100", 18));
+
+            // Bob must approve tokens for Router to spend
+            await TokenA.connect(bob).approve(RouterAddr, ethers.parseUnits("10", 18));
+
+            // Set deadline
+            const latestBlock = await ethers.provider.getBlock("latest");
+            const deadline = latestBlock.timestamp + 1000;
+
+            // Attempt swap
+            await Router.connect(bob).swapExactTokensForTokens(ethers.parseUnits("10", 18), ethers.parseEther("0.09"), 
+            [TokenAAddr, TokenBAddr], bob.address, deadline);
+
+            expect( await TokenB.balanceOf(bob.address)).to.be.gt(0n);
+
+        });
+
+        // Swap token for ETH
+        it("Should allow bob to swap Token A for Ether", async function() {
+            // Get Bob's starting ETH balance
+            const bobStartingEth = await ethers.provider.getBalance(bob.address);
+
+            // Bob must approve additional tokens for Router to transfer from
+            await TokenA.connect(bob).approve(RouterAddr, ethers.parseUnits("10", 18));
+
+            // Set deadline
+            const latestBlock = await ethers.provider.getBlock("latest");
+            const deadline = latestBlock.timestamp + 1000;
+           
+            // Attempt swap
+            await Router.connect(bob).swapExactTokensForETH(ethers.parseUnits("10", 18), ethers.parseEther("0.09"), 
+            [TokenAAddr, WETHAddr], bob.address, deadline);
+
+            // Get Bob's ending ETH balance
+            const bobEndingEth = await ethers.provider.getBalance(bob.address);
+            console.log("Bob's starting ETH balance: ", ethers.formatEther(bobStartingEth));
+            console.log("Bob's ending ETH balance: ",  ethers.formatEther(bobEndingEth));
+            expect(bobEndingEth).to.be.gt(bobStartingEth)
+        });
+
+        // Swap ETH for token
+
+        // Multihop swap
+    });
+    
 
     
 

@@ -26,6 +26,8 @@ contract DEXRouter is IDEXRouter {
 
     event Amounts(uint min, uint optimal, uint desired);
 
+    receive() external payable {}
+
     // Liquidity Functions
 
     /**
