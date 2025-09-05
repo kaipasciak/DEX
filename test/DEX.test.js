@@ -10,10 +10,10 @@ describe("DEX Factory Functionality", function() {
     let Factory, Router;
 
     // Token declarations
-    let TokenA, TokenB, WETH;
+    let TokenA, TokenB, TokenC, WETH;
 
     // Address declarations
-    let TokenAAddr, TokenBAddr, WETHAddr, FactoryAddr, RouterAddr;
+    let TokenAAddr, TokenBAddr, TokenCAddr, WETHAddr, FactoryAddr, RouterAddr;
 
 
     before(async function() {
@@ -42,6 +42,16 @@ describe("DEX Factory Functionality", function() {
         await TokenB.waitForDeployment();
         TokenBAddr = await TokenB.getAddress();
         console.log("TokenB deployed at: ", TokenBAddr);
+
+        TokenC = await ethers.deployContract("MockERC20", [
+            "Token C",
+            "CCC",
+            18,
+            ethers.parseUnits("1000000", 18)
+        ], { signer: deployer });
+        await TokenC.waitForDeployment();
+        TokenCAddr = await TokenC.getAddress();
+        console.log("TokenC deployed at: ", TokenCAddr);
 
         WETH = await hre.ethers.deployContract("MockWETH");
         await WETH.waitForDeployment();
@@ -223,8 +233,59 @@ describe("DEX Factory Functionality", function() {
         });
 
         // Swap ETH for token
+        it("Should allow Bob to exchange ether for Token C", async function () {
+            // deadline
+            const latestBlock = await ethers.provider.getBlock("latest");
+            const deadline = latestBlock.timestamp + 1000;
+
+            // Approve Token C
+            await TokenC.connect(deployer).approve(RouterAddr, ethers.parseUnits("5000", 18));
+            // Add liquidity to CCC/WETH
+            await Router.connect(deployer).addLiquidityETH(TokenCAddr, ethers.parseUnits("5000", 18), ethers.parseUnits("5000", 18),
+            ethers.parseEther("9.0"), deployer.address, deadline, { value: ethers.parseEther("10.0") });
+
+            /*
+            // Get reserves to verify
+            let pairAddr = await Factory.getPair(TokenCAddr, WETHAddr);
+            let pair = await ethers.getContractAt("DEXPair", pairAddr);
+            const [reserve0, reserve1] = await pair.getReserves();
+            console.log(ethers.formatEther(reserve0.toString()), ethers.formatEther(reserve1.toString()));
+            */
+
+            // deadline 2
+            const latestBlock2 = await ethers.provider.getBlock("latest");
+            const deadline2 = latestBlock2.timestamp + 1000;
+
+            // Bob should expect roughly 1600 with updated price when swap executes
+            // Attempt swap
+            await Router.connect(bob).swapExactETHForTokens(ethers.parseUnits("1500", 18), [WETHAddr, TokenCAddr], bob.address,
+            deadline2, { value: ethers.parseEther("5.0") });
+
+            let bobTokenCBalance = await TokenC.balanceOf(bob.address);
+            console.log("Bob Token C Balance: ", ethers.formatEther(bobTokenCBalance.toString()));
+            expect(bobTokenCBalance).to.be.gt(0n);
+            
+
+        });
 
         // Multihop swap
+        it("Should let Bob transfer Token C for Token A with path of length 3 passed", async function (){
+            // Approve router allowance from Bob address
+            await TokenC.connect(bob).approve(RouterAddr, ethers.parseUnits("500", 18));
+
+            // Deadline
+            const latestBlock = await ethers.provider.getBlock("latest");
+            const deadline = latestBlock.timestamp + 1000;
+
+            // Attempt swap
+            await Router.connect(bob).swapExactTokensForTokens(ethers.parseUnits("500", 18), ethers.parseUnits("0", 18), [TokenCAddr, WETHAddr, TokenAAddr], bob.address, deadline);
+
+            // Check balance
+            let bobTokenABalance = await TokenA.balanceOf(bob.address);
+            let bobTokenCBalance = await TokenC.balanceOf(bob.address);
+            console.log("Bob Token A Balance: ", ethers.formatEther(bobTokenABalance.toString()));
+            console.log("Bob Token C Balance: ",ethers.formatEther(bobTokenCBalance.toString()));
+        });
     });
     
 

@@ -49,6 +49,7 @@ TODO: Write deploy script and python script
 
 
 ## To-do
+- Look at decimal calculation when deploying mock tokens in test file
 - Figure out how to deploy onto ganache blockchain using hardhat project deploy script
 - Write test script and debug deploy script if needed
 - Write launch.py to interact with dApp through python
