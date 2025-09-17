@@ -38,24 +38,25 @@ TODO: Finish
 In scripts/, deploy.js deploys the Router, Factory, MockWETH and Mock Token smart contracts for the front end to interact with. 
 
 ## Local Setup and Usage
-Start ganache blockchain with the following line
-`ganache --mnemonic "test test test test test test test test test test test junk"`
-Compile contracts and deploy them with the following lines
+3 terminal windows will be needed to run this app
+In the first "ganache" window, start ganache blockchain from the project root with the following line:
+`ganache-cli`
+In the second "backend" window, compile contracts and deploy them from the project root with the following lines:
 `npx hardhat compile`
 `npx hardhat run scripts/deploy.js --network ganache`
+In the third "frontend" window, start the front end window by first navigating to the frontend directory and running the following:
+`npm start`
 Work in progress
 Run launch.py from command line
-
-TODO: Write deploy script and python script
-
 
 
 
 ## To-do
-- Look at decimal calculation when deploying mock tokens in test file
-- Figure out how to deploy onto ganache blockchain using hardhat project deploy script
 - Finish frontend
-- In deploy.js, automate updating contract ABI/address after deployment
+- Finish child panels
+- Debug
+- Add css
+
 
 
 

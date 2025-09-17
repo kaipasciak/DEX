@@ -64,6 +64,11 @@ async function main () {
     let RouterAddr = await Router.getAddress();
     console.log("Router deployed at: ", RouterAddr);
 
+    // Mint tokens to deployer
+    await TokenA.connect(deployer).mint(deployer.address, ethers.parseUnits("10000", 18));
+    await TokenB.connect(deployer).mint(deployer.address, ethers.parseUnits("10000", 18));
+    await TokenC.connect(deployer).mint(deployer.address, ethers.parseUnits("10000", 18));
+
     // Save addresses to frontend
     const __filename = fileURLToPath(import.meta.url);
     const __dirname = path.dirname(__filename);
