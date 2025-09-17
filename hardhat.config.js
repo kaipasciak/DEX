@@ -8,5 +8,11 @@ module.exports = {
       { version: "0.8.20" }
     ]
   },
-  defaultNetwork: "hardhat"
+  defaultNetwork: "hardhat",
+  networks: {
+    hardhat: {},
+    ganache: {
+      url: "http://127.0.0.1:8545"
+    }
+  }
 };

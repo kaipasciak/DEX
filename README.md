@@ -1,7 +1,9 @@
 # Decentralized Exchange
 ## Author: Kai Pasciak
 
-KaiSwap is a decentralized exchange designed for the Ethereum test network that uses an automated market maker model. It enables ERC-20 token swapping, liquidity provision and liquidity pool token minting and is based on UniSwap V2.
+KaiSwap is a decentralized exchange designed for the Ethereum test network that uses an automated market maker model, and built using
+a Hardhat + React architecture. It enables ERC-20 token swapping, liquidity provision and liquidity pool token minting and is based 
+on UniSwap V2. 
 
 This project is for local development and is not deployed on a public blockchain.
 
@@ -33,6 +35,7 @@ npx hardhat run scripts/PairInitCodeHash.js
 TODO: Finish
 
 ## Frontend Description
+In scripts/, deploy.js deploys the Router, Factory, MockWETH and Mock Token smart contracts for the front end to interact with. 
 
 ## Local Setup and Usage
 Start ganache blockchain with the following line
@@ -51,9 +54,8 @@ TODO: Write deploy script and python script
 ## To-do
 - Look at decimal calculation when deploying mock tokens in test file
 - Figure out how to deploy onto ganache blockchain using hardhat project deploy script
-- Write test script and debug deploy script if needed
-- Write launch.py to interact with dApp through python
-- Write launch2.py to interact with dApp through locally hosted frontend
+- Finish frontend
+- In deploy.js, automate updating contract ABI/address after deployment
 
 
 
