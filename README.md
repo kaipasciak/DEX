@@ -46,15 +46,15 @@ In the second "backend" window, compile contracts and deploy them from the proje
 `npx hardhat run scripts/deploy.js --network ganache`
 In the third "frontend" window, start the front end window by first navigating to the frontend directory and running the following:
 `npm start`
-Work in progress
-Run launch.py from command line
+Make sure MetaMask is installed and set to the locally hosted network
+Add the first account to MetaMask and import test tokens. Ensure the deployer's account has expected balances
 
 
 
 ## To-do
 - Finish frontend
-- Finish child panels
-- Debug
+- Debug, input validation and exception handling etc.
+- Fix issue where deployer address/signature is hardcoded, allowing other accounts to sign messages on the deployer's behalf
 - Add css
 
 

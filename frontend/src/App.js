@@ -64,8 +64,8 @@ function App() {
       {account && router && factory && signer && (
         <div className="space-y-6">
           <SwapPanel router={router} factory={factory} signer={signer} weth={addresses.WETH}/>
-          <LiquidityPanel router={router} />
-          <PairLookup factory={factory} />
+          <LiquidityPanel router={router} signer={signer}/>
+          <PairLookup factory={factory} signer={signer} />
           </div>
       )}
     </div>

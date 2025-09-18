@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { ethers } from "ethers";
+import MockERC20Artifact from "../artifacts/abis/MockERC20.json";
 
 function SwapPanel({ router, factory, signer, weth }) {
     const [amountIn, setAmountIn] = useState("");
@@ -13,7 +14,7 @@ function SwapPanel({ router, factory, signer, weth }) {
 
             let path = [];
 
-            // ETH/Token Swaps
+            // For ETH/Token Swaps
             if (tokenIn === "ETH") {
                 path = [weth, tokenOut];
                 const tx = await router.swapExactETHForTokens(
@@ -27,9 +28,10 @@ function SwapPanel({ router, factory, signer, weth }) {
                 alert("ETH -> Token swap successful!");
                 return;
             }
-
+            
+            // For Token / ETH swaps
             if (tokenOut === "ETH") {
-                const tokenContract = new ethers.Contract(tokenIn, router.interface.fragments, signer);
+                const tokenContract = new ethers.Contract(tokenIn, MockERC20Artifact.abi, signer);
                 await tokenContract.approve(router.target, ethers.parseUnits(amountIn, 18));
                 path = [tokenIn, weth];
                 const tx = await router.swapExactTokensForETH(
@@ -44,10 +46,12 @@ function SwapPanel({ router, factory, signer, weth }) {
                 return;
             }
 
+            // For Token / Token swaps
             const directPair = await factory.getPair(tokenIn, tokenOut);
             if (directPair !== ethers.ZeroAddress) {
                 path = [tokenIn, tokenOut];
             } else {
+                // Trade through wrapped ether if no direct pair found
                 const pairA = await factory.getPair(tokenIn, weth);
                 const pairB = await factory.getPair(tokenOut, weth);
                 if (pairA !== ethers.ZeroAddress && pairB !== ethers.ZeroAddress){
@@ -58,7 +62,7 @@ function SwapPanel({ router, factory, signer, weth }) {
                 }
             }
 
-            const tokenContract = new ethers.Contract(tokenIn, router.interface.fragments, signer);
+            const tokenContract = new ethers.Contract(tokenIn, MockERC20Artifact.abi, signer);
             await tokenContract.approve(router.target, ethers.parseUnits(amountIn, 18));
             const tx = await router.swapExactTokensForTokens(
                 ethers.parseUnits(amountIn, 18),

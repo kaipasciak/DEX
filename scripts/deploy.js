@@ -26,7 +26,7 @@ async function main () {
     ]);
     await TokenA.waitForDeployment();
     let TokenAAddr = await TokenA.getAddress();
-    console.log("Test Token deployed at: ", TokenAAddr);
+    console.log("Token A deployed at: ", TokenAAddr);
 
     const TokenB = await ethers.deployContract("MockERC20", [
         "Token B",
@@ -36,7 +36,7 @@ async function main () {
     ]);
     await TokenB.waitForDeployment();
     let TokenBAddr = await TokenB.getAddress();
-    console.log("Test Token deployed at: ", TokenBAddr);
+    console.log("Token B deployed at: ", TokenBAddr);
 
     const TokenC = await ethers.deployContract("MockERC20", [
         "Token C",
@@ -46,7 +46,7 @@ async function main () {
     ]);
     await TokenC.waitForDeployment();
     let TokenCAddr = await TokenC.getAddress();
-    console.log("Test Token deployed at: ", TokenCAddr);
+    console.log("Token C deployed at: ", TokenCAddr);
 
     // Deploy factory contract
     const Factory = await hre.ethers.deployContract("DEXFactory");
