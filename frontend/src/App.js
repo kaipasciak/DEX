@@ -1,5 +1,5 @@
 import './App.css';
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ethers } from "ethers";
 
 // Import artifacts
@@ -19,33 +19,58 @@ function App() {
   const [factory, setFactory] = useState(null);
 
   async function connectWallet() {
-    if (!window.ethereum) {
-      alert("MetaMask not found!");
-      return;
-    }
+    try {
+      if (!window.ethereum) {
+        alert("MetaMask not found!");
+        return;
+      }
 
-    await window.ethereum.request({ method: "eth_requestAccounts" });
+      const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+      await loadProvider(accounts[0]);
+
+    } catch (err) {
+      console.error(err);
+      // alert(err.message);
+    }
+  }
+
+  // Load provider here
+  async function loadProvider(accountAddress) {
     const provider = new ethers.BrowserProvider(window.ethereum);
     const signer = await provider.getSigner();
-    const address = await signer.getAddress();
+    const address = accountAddress || await signer.getAddress();
 
     setAccount(address);
     setSigner(signer);
 
-    const routerContract = new ethers.Contract(
-      addresses.router,
-      RouterArtifact.abi,
-      signer
-    );
+    const routerContract = new ethers.Contract(addresses.router, RouterArtifact.abi, signer);
     setRouter(routerContract);
 
-    const factoryContract = new ethers.Contract(
-      addresses.factory,
-      FactoryArtifact.abi,
-      signer
-    );
+    const factoryContract = new ethers.Contract(addresses.factory, FactoryArtifact.abi, signer);
     setFactory(factoryContract);
   }
+
+  // Useeffect here (listeners for metamask events)
+  useEffect(() => {
+    if (!window.ethereum) return;
+
+    window.ethereum.on("accountsChanged", (accounts) => {
+      if (accounts.length > 0) {
+        loadProvider(accounts[0]);
+      } else {
+        setAccount(null);
+        setSigner(null);
+        setRouter(null);
+        setFactory(null);
+      }
+    });
+
+    return () => {
+      if (window.ethereum.removeListener) {
+        window.ethereum.removeListener("accountsChanged", () => {});
+      }
+    };
+  }, []);
 
   return (
     <div className="App">

@@ -31,16 +31,23 @@ The quoter, to keep all of the functions pure, uses create2 to determine the pai
 of its functions for a given pair. A script was written for this to get the init code of the pair contract. It
 can be run from the command line as follows:
 npx hardhat run scripts/PairInitCodeHash.js
+This script should be run after any changes made to the pair contract and the udpates init code should be put in the quoter library.
+
 
 TODO: Finish
 
 ## Frontend Description
 In scripts/, deploy.js deploys the Router, Factory, MockWETH and Mock Token smart contracts for the front end to interact with. 
+React is used to construct the frontend of this application. Index.html contains index.js, which contains app.js.
+App.js handles wallet connection and then passes the necessary information to three child panels.
+LiquidityPanel.js allows users to create/contribute to liquidity pools for a given pair, as well as redeem liquidity tokens
+for underlying assets. SwapPanel.js allows users to trade assets using these liquidity pools. PairLookup queries the smart 
+contracts to determine the address of a pair contract for two assets if it exists.
 
 ## Local Setup and Usage
 3 terminal windows will be needed to run this app
 In the first "ganache" window, start ganache blockchain from the project root with the following line:
-`ganache-cli`
+`ganache-cli --mnemonic "test test test test test test test test test test test junk"`
 In the second "backend" window, compile contracts and deploy them from the project root with the following lines:
 `npx hardhat compile`
 `npx hardhat run scripts/deploy.js --network ganache`
