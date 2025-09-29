@@ -74,7 +74,7 @@ function App() {
 
   return (
     <div className="App">
-      <h1 className="test-2xl font-bold mb-4">KaiSwap</h1>
+      <h1 className="App-header">KaiSwap</h1>
       {!account ? (
         <button
           onClick={connectWallet}

@@ -121,7 +121,7 @@ function LiquidityPanel({ signer }) {
 
     return (
         <div className="p-4 border rounded">
-            <h2 className="font-bold mb-2">Liquidity Panel</h2>
+            <h2 className="Component-header">Liquidity Panel</h2>
 
             <div className="mb-2">
                 <input

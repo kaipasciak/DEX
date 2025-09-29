@@ -81,7 +81,7 @@ function SwapPanel({ router, factory, signer, weth }) {
 
     return (
         <div className="border p-4 rounded space-y-2">
-            <h2 className="font-bold">Swap Tokens</h2>
+            <h2 className="Component-header">Swap Tokens</h2>
             <input
                 placeholder="Token In (ETH or address)"
                 value={tokenIn}
@@ -100,9 +100,9 @@ function SwapPanel({ router, factory, signer, weth }) {
                 onChange={(e) => setAmountIn(e.target.value)}
                 className="border p-1 w-full"
             />
-            <button
+            <button 
                 onClick={handleSwap}
-                className="bg-blue-500 text-white px-3 py-1 rounded"
+                className="shine-button"
             >
                 Swap
             </button>

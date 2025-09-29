@@ -38,7 +38,7 @@ function PairLookup({ signer }) {
 
     return (
         <div className="p-4 border rounded">
-            <h2 className="font-bold mb-2">Pair Lookup</h2>
+            <h2 className="Component-header">Pair Lookup</h2>
 
             <div className="mb-2">
                 <input
