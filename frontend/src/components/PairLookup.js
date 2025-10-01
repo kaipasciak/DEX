@@ -17,7 +17,7 @@ function PairLookup({ signer }) {
         
         // Set pair address
         try {
-            const pairAddressTemp = await factory.getPair(tokenA, tokenB);
+            var pairAddressTemp = await factory.getPair(tokenA, tokenB);
             setPairAddress(pairAddressTemp);
 
         } catch (err) {
@@ -27,7 +27,7 @@ function PairLookup({ signer }) {
 
         // Set user balance of specified pair's liquidity tokens
         try {
-            const pair = new ethers.Contract(pairAddress, PairArtifact.abi, signer);
+            const pair = new ethers.Contract(pairAddressTemp, PairArtifact.abi, signer);
             const balanceTemp = await pair.balanceOf(await signer.getAddress());
             setBalance(ethers.formatEther(balanceTemp));
         } catch (err) {
