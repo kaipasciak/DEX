@@ -102,7 +102,7 @@ function SwapPanel({ router, factory, signer, weth }) {
             />
             <button 
                 onClick={handleSwap}
-                className="shine-button"
+                className="button-style"
             >
                 Swap
             </button>

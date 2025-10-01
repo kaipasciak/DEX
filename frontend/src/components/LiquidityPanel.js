@@ -130,8 +130,6 @@ function LiquidityPanel({ signer }) {
                     onChange={(e) => setTokenA(e.target.value)}
                     className="border p-1 w-full"
                 />
-            </div>
-            <div className="mb-2">
                 <input
                     placeholder="Token B address"
                     value={tokenB}
@@ -146,23 +144,20 @@ function LiquidityPanel({ signer }) {
                     onChange={(e) => setAmountADesired(e.target.value)}
                     className="border p-1 w-full"
                 />
-            </div>
-            <div className="mb-2">
                 <input
                     placeholder="Amount B Desired"
                     value={amountBDesired}
                     onChange={(e) => setAmountBDesired(e.target.value)}
                     className="border p-1 w-full"
                 />
-            </div>
-
-            <button
-                onClick={handleAddLiquidity}
-                className="bg-green-500 text-white px-4 py-2 rounded mr-2"
-            >
-                Add Liquidity
-            </button>
-            <div className="mt-4">
+                <button
+                    onClick={handleAddLiquidity}
+                    className="button-style"
+                >
+                    Add Liquidity
+                </button>
+            </div> 
+            <div> 
                 <input
                     placeholder="Liquidity amount"
                     value={liquidity}
@@ -171,7 +166,7 @@ function LiquidityPanel({ signer }) {
                 />
                 <button
                     onClick={handleRemoveLiquidity}
-                    className="bg-red-500 text-white px-4 py-2 rounded mt-2"
+                    className="button-style"
                 >
                     Remove Liquidity
                 </button>

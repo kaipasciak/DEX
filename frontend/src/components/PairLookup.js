@@ -47,23 +47,19 @@ function PairLookup({ signer }) {
                     onChange={(e) => setTokenA(e.target.value)}
                     className="border p-1 w-full"
                 />
-            </div>
-
-            <div className="mb-2">
                 <input
                     placeholder="Token B Address"
                     value={tokenB}
                     onChange={(e) => setTokenB(e.target.value)}
                     className="border p-1 w-full"
                 />
+                <button
+                    onClick={handleLookup}
+                    className="button-style"
+                >
+                    Lookup Pair
+                </button>
             </div>
-
-            <button
-                onClick={handleLookup}
-                className="bg-blue-500 text-white px-4 py-2 rounded"
-            >
-                Lookup Pair
-            </button>
 
             {pairAddress && (
                 <p className="mt-2 break-all">

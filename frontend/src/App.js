@@ -78,7 +78,7 @@ function App() {
       {!account ? (
         <button
           onClick={connectWallet}
-          className="border px-4 py-2 rounded hover:bg-gray-200"
+          className="button-style"
         >
           Connect Wallet
         </button>
@@ -91,7 +91,7 @@ function App() {
           <SwapPanel router={router} factory={factory} signer={signer} weth={addresses.WETH}/>
           <LiquidityPanel router={router} signer={signer}/>
           <PairLookup factory={factory} signer={signer} />
-          </div>
+        </div>
       )}
     </div>
   );
